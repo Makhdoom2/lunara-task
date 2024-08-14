@@ -2,69 +2,16 @@ import React from "react";
 import { Flex } from "antd";
 import InsightDetail from "./insight-detail";
 import { ButtonContainer, StyledRangePicker, CustomSegmented } from "./styles";
-
-const sampleErrorStatements27 = [
-  {
-    date: "Mar 27, 00:56 UTC",
-    status: "Resolved",
-    detail: "This incident has been resolved.",
-  },
-  {
-    date: "Mar 27, 00:53 UTC",
-    status: "Monitoring",
-    detail:
-      "This issue has been mitigated. We are closely monitoring our systems as we recover.",
-  },
-];
-
-const sampleErrorStatements25 = [
-  {
-    date: "Mar 25, 00:56 UTC",
-    status: "Resolved",
-    detail: "This incident has been resolved.",
-  },
-  {
-    date: "Mar 25, 00:53 UTC",
-    status: "Monitoring",
-    detail:
-      "This issue has been mitigated. We are closely monitoring our systems as we recover.",
-  },
-];
-
-const sampleData = [
-  {
-    date: "Mar 29, 2024",
-    error: null,
-    errorStatements: [],
-  },
-  {
-    date: "Mar 28, 2024",
-    error: "Elevated /transactions/get and /transactions/recurring/get errors",
-    errorStatements: [],
-  },
-  {
-    date: "Mar 27, 2024",
-    error: "Minor connectivity issues",
-    errorStatements: sampleErrorStatements27,
-  },
-  {
-    date: "Mar 26, 2024",
-    error: null,
-    errorStatements: [],
-  },
-  {
-    date: "Mar 25, 2024",
-    error: "Elevated /transactions/get and /transactions/recurring/get errors",
-    errorStatements: sampleErrorStatements25,
-  },
-  {
-    date: "Mar 24, 2024",
-    error: null,
-    errorStatements: [],
-  },
-];
+import { useGetIncidents } from "@/app/utils/use-get-incident";
+import { DayData } from "@/app/types/incident";
+import { format } from "date-fns";
 
 const Insight = () => {
+  const { data, error, isLoading } = useGetIncidents();
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error loading incidents: {error.message}</div>;
+
   return (
     <Flex style={{ flexDirection: "column" }}>
       <ButtonContainer>
@@ -79,12 +26,15 @@ const Insight = () => {
       </ButtonContainer>
 
       <Flex style={{ marginTop: "44px", flexDirection: "column", gap: "32px" }}>
-        {sampleData.map((data, index) => (
+        {data?.days.map((data: DayData, index: number) => (
           <InsightDetail
             key={index}
-            date={data.date}
+            timestamp={format(
+              new Date(data.timestamp).toLocaleDateString(),
+              "MMM dd, yyyy"
+            )}
             error={data.error}
-            errorStatements={data.errorStatements}
+            incidents={data.incidents}
           />
         ))}
       </Flex>

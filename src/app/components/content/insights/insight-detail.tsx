@@ -2,28 +2,14 @@ import { Divider, Flex } from "antd";
 import React from "react";
 import Statement from "./statement";
 import CustomText from "../../text/custom-text";
+import { DayData, Incident } from "@/app/types/incident";
+import { format } from "date-fns";
 
-interface ErrorStatement {
-  date: string;
-  status: string;
-  detail: string;
-}
-
-interface InsightDetailProps {
-  date: string;
-  error?: string | null;
-  errorStatements?: ErrorStatement[] | null;
-}
-
-const InsightDetail: React.FC<InsightDetailProps> = ({
-  date,
-  error,
-  errorStatements,
-}) => {
+const InsightDetail: React.FC<DayData> = ({ timestamp, error, incidents }) => {
   return (
     <Flex style={{ flexDirection: "column", maxWidth: "861px" }}>
       <CustomText
-        text={date}
+        text={timestamp}
         lineHeight="24px"
         weight={600}
         size="20px"
@@ -56,13 +42,16 @@ const InsightDetail: React.FC<InsightDetailProps> = ({
         />
       )}
 
-      {errorStatements &&
-        errorStatements.map((statement, index) => (
+      {incidents &&
+        incidents.map((statement: Incident, index: number) => (
           <Statement
             key={index}
-            date={statement.date}
-            status={statement.status}
-            detail={statement.detail}
+            date={format(
+              new Date(statement.timestamp).toLocaleDateString(),
+              "MMM dd, HH:mm 'UTC'"
+            )}
+            status={statement.type}
+            detail={statement.details}
           />
         ))}
     </Flex>
